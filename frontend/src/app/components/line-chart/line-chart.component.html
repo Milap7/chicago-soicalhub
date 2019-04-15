@@ -1,0 +1,21 @@
+<h2>{{ title }}</h2>
+
+<mat-form-field style = "margin: 20px 20px 20px 20px">
+  <mat-label>Past 1 Hour</mat-label>
+  <mat-select [(value)]="numHours" (selectionChange)="changeInterval()">
+    <mat-option value="1">Past Hour</mat-option>
+    <mat-option value="24">Past 24 Hours</mat-option>
+    <mat-option value="168">Past 7 Days</mat-option>
+  </mat-select>
+</mat-form-field>
+
+<button mat-raised-button color="primary"  style = "margin:40px 0px 0px 20px"  routerLink = "/list_of_stations" >
+  Back
+  &nbsp; &nbsp; &nbsp;
+  <mat-icon>keyboard_arrow_left</mat-icon>
+</button>
+<div id="chartElm">
+
+</div>
+<!--<svg width="1200" height="500"></svg>-->
+
