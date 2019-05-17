@@ -1,28 +1,35 @@
 <h2>{{ title }}</h2>
-<button mat-raised-button color="primary"  style = "margin-left:20px"  routerLink = "/find" >
+<!-- <button mat-raised-button color="primary"  style = "margin-left:20px; background-color: purple"  routerLink = "/homepage" >
   Home
   &nbsp; &nbsp; &nbsp;
-  <mat-icon>search</mat-icon>
+  <mat-icon>home</mat-icon>
 </button>
 
-<button mat-raised-button color="primary"  style = "float:right; margin-right:20px"  routerLink = "/list_of_stations" >
+<button mat-raised-button color="primary"  style = "float:right; margin-right:20px; background-color:purple"  routerLink = "/list_of_stations" >
   Back
   &nbsp; &nbsp; &nbsp;
   <mat-icon>keyboard_arrow_left</mat-icon>
-</button>
+</button> -->
 <div style = "margin-left:40px; margin-top:30px">
   <mat-form-field>
     <mat-label>Time Range</mat-label>
-    <mat-select [(value)]="numHours" (selectionChange)="changeInterval(numHours)">
+    <mat-select [(value)]="numHours" (selectionChange)="changeInterval_line(numHours)">
       <mat-option value="1">Past Hour</mat-option>
       <mat-option value="24">Past 24 Hours</mat-option>
       <mat-option value="168">Past 7 Days</mat-option>
+      <mat-option value="672">Past 1 Month</mat-option>
     </mat-select>
   </mat-form-field>
-  <input type = "checkbox" style = "margin-left:20px" class="example-margin" [(ngModel)]="checked1" (ngModelChange) = "onCheck1(checked1)"/>Past 1 Hour
-  <input type = "checkbox" style = "margin-left:20px"  class="example-margin" [(ngModel)]="checked24" (ngModelChange) = "onCheck24(checked24)"/>Past 24 Hour
+  <!-- <input type = "checkbox" style = "margin-left:20px" class="example-margin" [(ngModel)]="checked1" (ngModelChange) = "onCheck1(checked1)"/>Past 1 Hour
+  <input type = "checkbox" style = "margin-left:20px"  class="example-margin" [(ngModel)]="checked24" (ngModelChange) = "onCheck24(checked24)"/>Past 24 Hour -->
 </div>
-<div id="chartElm">
+<!-- <div style = "text-align: left; margin-left: 50px">
+  <br><br> 
+  Line Chart for Available Docks   
+  <br><br>
+  
+</div> -->
+<div id="chartElm_line" style="margin-right: 20px; margin-left:20px; margin-bottom: 20px">
 
 </div>
 

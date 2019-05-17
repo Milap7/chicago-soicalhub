@@ -1,86 +1,121 @@
-<div>
+<!-- <div class="container">
+    <h1>
+        {{title}}
+    </h1>
+    <button (click)="notify()">Show Notiication</button>
+</div> -->
+<div >
   <br>
   <mat-card>
-    <button mat-raised-button color="primary" routerLink="/find">
+    <button mat-raised-button color="primary" style = "background-color: purple" routerLink="/homepage">
       Home
       &nbsp; &nbsp; &nbsp; 
-      <mat-icon>search</mat-icon>    
+      <mat-icon>home</mat-icon>    
     </button>
-    <button mat-raised-button color="primary"  routerLink="/list_of_places" style = "float:right">
+    <button mat-raised-button color="primary"  routerLink="/list_of_places" style = "float:right; margin-right:10px; background-color:purple">
       Back
       &nbsp; &nbsp; &nbsp; 
       <mat-icon>keyboard_arrow_left</mat-icon>    
   </button>
-    <button mat-raised-button color="primary"  routerLink="stacked-bar-chart" style = "margin-left:10px">
-        Draw Chart
-        &nbsp; &nbsp; &nbsp; 
-        <mat-icon>search</mat-icon>    
-    </button>
+    
     <br><br>
     <mat-divider></mat-divider>
     <br>
     <table mat-table [dataSource]="stations">
       <ng-container matColumnDef="id">
-        <th mat-header-cell *matHeaderCellDef>ID</th>
+        <th mat-header-cell style *matHeaderCellDef style = "font-weight: bold; font-size: 15px">Station ID</th>
         <td mat-cell *matCellDef="let element"> {{element.id}} </td>
       </ng-container>
 
       <ng-container matColumnDef="stationName">
-        <th mat-header-cell *matHeaderCellDef>stationName</th>
+        <th mat-header-cell *matHeaderCellDef style = "font-weight: bold; font-size: 15px">Station Name</th>
         <td mat-cell *matCellDef="let element"> {{element.stationname}} </td>
       </ng-container>
 
       <ng-container matColumnDef="availableBikes">
-        <th mat-header-cell *matHeaderCellDef>availableBikes</th>
+        <th mat-header-cell *matHeaderCellDef style = "font-weight: bold; font-size: 15px">Available Bikes</th>
         <td mat-cell *matCellDef="let element"> {{element.availablebikes}} </td>
       </ng-container>
 
       <ng-container matColumnDef="availableDocks">
-        <th mat-header-cell *matHeaderCellDef>availableDocks</th>
+        <th mat-header-cell *matHeaderCellDef style = "font-weight: bold; font-size: 15px">Available Docks</th>
         <td mat-cell *matCellDef="let element"> {{element.availabledocks}} </td>
       </ng-container>
 
       <ng-container matColumnDef="is_renting">
-        <th mat-header-cell *matHeaderCellDef>is_renting</th>
+        <th mat-header-cell *matHeaderCellDef style = "font-weight: bold; font-size: 15px">Is_Renting</th>
         <td mat-cell *matCellDef="let element"> {{element.is_renting}} </td>
       </ng-container>
 
       <ng-container matColumnDef="lastCommunicationTime">
-        <th mat-header-cell *matHeaderCellDef>lastCommunicationTime </th>
+        <th mat-header-cell *matHeaderCellDef style = "font-weight: bold; font-size: 15px">Last Comm Time </th>
         <td mat-cell *matCellDef="let element"> {{element.lastCommunicationTime}} </td>
       </ng-container>
 
       <ng-container matColumnDef="latitude">
-        <th mat-header-cell *matHeaderCellDef>latitude</th>
+        <th mat-header-cell *matHeaderCellDef style = "font-weight: bold; font-size: 15px">Latitude</th>
         <td mat-cell *matCellDef="let element"> {{element.latitude}} </td>
       </ng-container>
 
       <ng-container matColumnDef="longitude">
-        <th mat-header-cell *matHeaderCellDef>longitude</th>
+        <th mat-header-cell *matHeaderCellDef style = "font-weight: bold; font-size: 15px">Longitude</th>
         <td mat-cell *matCellDef="let element"> {{element.longitude}} </td>
       </ng-container>
 
       <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef>status</th>
+        <th mat-header-cell *matHeaderCellDef style = "font-weight: bold; font-size: 15px">Status</th>
         <td mat-cell *matCellDef="let element"> {{element.status}} </td>
       </ng-container>
 
-        <th mat-header-cell *matHeaderCellDef>totalDocks</th>
       <ng-container matColumnDef="totalDocks">
-        <th mat-header-cell *matHeaderCellDef>totalDocks</th>
+        <th mat-header-cell *matHeaderCellDef style = "font-weight: bold; font-size: 15px">Total Docks</th>
         <td mat-cell *matCellDef="let element"> {{element.totaldocks}} </td>
       </ng-container>
 
-      <ng-container matColumnDef="realTimeChart">
+      <ng-container matColumnDef="dashboard">
+          <th mat-header-cell *matHeaderCellDef></th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-raised-button color="primary" style="margin-left:5px; background-color:purple"  (click)="sendIDSMA(element.id)" >
+              Dashboard
+              &nbsp; &nbsp; &nbsp;
+              <mat-icon>dashboard</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+
+      <!-- <ng-container matColumnDef="realTimeChart">
         <th mat-header-cell *matHeaderCellDef></th>
         <td mat-cell *matCellDef="let element">
-          <button mat-raised-button color="primary" (click)="sendID(element.id)" >
-            Real Time Chart
+          <button mat-raised-button color="primary"  (click)="sendID(element.id)" >
+            LineChart
             &nbsp; &nbsp; &nbsp;
-            <mat-icon>bar_chart</mat-icon>
+            <mat-icon>show_chart</mat-icon>
           </button>
         </td>
-      </ng-container>
+      </ng-container> -->
+
+      <!-- <ng-container  matColumnDef="Stacked-Bar-Chart">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-raised-button color="primary"  routerLink="stacked-bar-chart" style = "margin-left:10px">
+            StackedBar
+            &nbsp; &nbsp; &nbsp; 
+            <mat-icon>bar_chart</mat-icon>    
+        </button>
+        </td>
+      </ng-container> -->
+
+      <!-- <ng-container matColumnDef="sma-chart">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let element">
+          <button mat-raised-button color="primary"  routerLink="sma-chart" style = "margin-left:10px">
+            SMAChart
+            &nbsp; &nbsp; &nbsp; 
+            <mat-icon>show_chart</mat-icon>    
+        </button>
+        </td>
+      </ng-container> -->
+      
 
       <!-- <ng-container matColumnDef="smaChart">
         <th mat-header-cell *matHeaderCellDef></th>
@@ -126,62 +161,33 @@
 
 
 
-  <agm-marker 
-  (markerClick)="clickedMarker('Union Station', 0)"
-  [latitude]="location.lat"
-  [longitude]="location.lng"
-  [iconUrl]= "icon"
-  [label]="{ color: 'white', text: 'You are Here'}">
-
-  <agm-info-window #infoWindow>
-    <strong>You are currently here by the Union Station</strong>
-
-  </agm-info-window>
-  </agm-marker>
-
-
- 
-
-  <agm-marker 
-  (markerClick)="clickedMarker('placeSelected', 0)"
+  <agm-marker *ngIf="placeSelected"
+  (markerClick)="clickedMarker('placeSelected.stationName', 0)"
   [latitude]="placeSelected.latitude"
   [longitude]="placeSelected.longitude"
-  [iconUrl] = "{ url: 'https://developers.google.com/maps/documentation/javascript/examples/full/images/beachflag.png',
-                scaledSize: {
-                  width: 40,
-                  height: 60
-              }}" >
+  [iconUrl]= "icon">
 
   <agm-info-window #infoWindow>
-    <strong>You have selected this place</strong>
-    <br><br><br>
-    <strong>Name: {{placeSelected.name}}</strong>
-    <br><br>
-    <strong>Phone: {{placeSelected.display_phone}}</strong>
-    <br><br>
-    <strong>Address: {{placeSelected.address1}}</strong>
+    <strong>Restaurant at: {{placeSelected.name}}</strong>
+
   </agm-info-window>
   </agm-marker>
-
- 
-
-
 
   <agm-marker 
     *ngFor="let m of markers; let i = index"
     (markerClick)="clickedMarker(m.stationName, i)"
     [latitude]="m.latitude"
     [longitude]="m.longitude"
-    [label]="m.id">
+    >
   
     <agm-info-window #infoWindow>
       <strong>Divvy Station</strong>
       <br><br>
-      <strong>stationName: {{m.stationName}}</strong>
+      <strong>stationName: {{m.stationname}}</strong>
       <br><br>
       <strong>status: {{m.status}}</strong>
       <br><br>
-      <strong>availableDocks: {{m.availableDocks}}</strong>
+      <strong>availableDocks: {{m.availabledocks}}</strong>
     </agm-info-window>
 
 
@@ -190,7 +196,7 @@
 
 
 
-  <agm-circle [latitude]="location.lat" [longitude]="location.lng"
+  <agm-circle *ngIf="placeSelected" [latitude]="placeSelected.latitude" [longitude]="placeSelected.longitude"
   [(radius)]="circleRadius"
   [fillColor]="'blue'"
   [circleDraggable]="true"
@@ -199,4 +205,3 @@
   
 </agm-map>
 
-<!-- <app-stacked-bar-chart [id]="chart" [data]="stations" *ngIf="showChart" ></app-stacked-bar-chart> -->

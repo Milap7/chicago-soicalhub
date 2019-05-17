@@ -35,19 +35,32 @@ export class FindComponent implements OnInit {
     this.hintColor = "#76FF03";
     this.createForm = this.fb.group({
       where: '',
-      find: ''
+      find: '',
+      zipcode: ''
 
     });
   }
 
-  findPlaces(find, where) {
+  findPlaces(find, where, zipcode) {
     
-    this.placesService.findPlaces(find, where).subscribe(() => {
+    console.log("Where: ");
+    console.log(where);
+    this.placesService.findPlaces(find, where, zipcode).subscribe(() => {
 
       this.router.navigate(['/list_of_places']);
 
     });
 
+
+  }
+
+  findPlacesZipcode(find, zipcode) {
+    console.log(zipcode);
+    this.placesService.findPlaces_Zipcode(find, zipcode).subscribe(() => {
+
+      this.router.navigate(['/list_of_places']);
+
+    });
 
   }
 

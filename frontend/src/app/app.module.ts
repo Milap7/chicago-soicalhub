@@ -40,22 +40,33 @@ import { BarChartComponent } from './components/bar-chart/bar-chart.component'
 import { StackedBarChartComponent } from './components/stacked-bar-chart/stacked-bar-chart.component';
 import { LineChartComponent } from './components/line-chart/line-chart.component';
 import { SmaChartComponent } from './components/sma-chart/sma-chart.component';
-import { RealTimeLineChartComponent } from './components/real-time-line-chart/real-time-line-chart.component'
+import { RealTimeLineChartComponent } from './components/real-time-line-chart/real-time-line-chart.component';
+import { HomepageComponent } from './components/homepage/homepage.component';
+import { HeatmapComponent } from './components/heatmap/heatmap.component'
+import { PushNotificationsService } from './push.notification.service';
+import { DashboardComponent } from './components/dashboard/dashboard.component';
+import { AlertsComponent } from './components/alerts/alerts.component';
+import { BarChartDivvyComponent } from './components/bar-chart-divvy/bar-chart-divvy.component';
 
 
 
 const routes: Routes = [
+  {path: 'homepage', component: HomepageComponent},
   { path: 'find', component: FindComponent},
   { path: 'list_of_places', component: ListOfPlacesComponent},
   { path: 'list_of_stations', component: ListOfStationsComponent},
+  {path : 'heatmap', component:HeatmapComponent},
 
   { path: 'list_of_places/bar-chart', component: BarChartComponent, data: {barChartData : "barChartData"}},
   { path: 'list_of_stations/stacked-bar-chart', component: StackedBarChartComponent },
   {path : 'list_of_stations/line-chart', component: LineChartComponent},
   {path : 'list_of_stations/real-time-line-chart', component: RealTimeLineChartComponent},
   {path: 'list_of_stations/sma-chart', component:SmaChartComponent},
+  {path : 'list_of_stations/dashboard', component: DashboardComponent},
+  {path: 'list_of_places/alerts', component: AlertsComponent},
+  {path : 'list_of_places/bar-chart-divvy', component: BarChartDivvyComponent},
 
-  { path: '', redirectTo: 'find', pathMatch: 'full'}
+  { path: '', redirectTo: 'homepage', pathMatch: 'full'}
 ];
 
 @NgModule({
@@ -65,7 +76,8 @@ const routes: Routes = [
     ListOfPlacesComponent,
     ListOfStationsComponent, 
     BarChartComponent, 
-    StackedBarChartComponent, LineChartComponent, SmaChartComponent, RealTimeLineChartComponent,  
+    StackedBarChartComponent, LineChartComponent, SmaChartComponent, RealTimeLineChartComponent, HomepageComponent, HeatmapComponent, DashboardComponent, AlertsComponent, BarChartDivvyComponent, 
+   
   ],
   imports: [
     BrowserModule,
@@ -100,12 +112,12 @@ const routes: Routes = [
 /////////////////////////////////////////////////////////////////////////////////////
 
 
-    AgmCoreModule.forRoot({apiKey: 'AIzaSyBIukm3_BLmzworS6HNmmCKN7Pk1NkYFfg'}),
+    AgmCoreModule.forRoot({apiKey: 'AIzaSyBIukm3_BLmzworS6HNmmCKN7Pk1NkYFfg'+'&libraries=visualization'}),
     FormsModule,
     NgbModule
   ],
 
-  providers: [PlacesService, GoogleMapsAPIWrapper],
+  providers: [PlacesService, GoogleMapsAPIWrapper, PushNotificationsService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

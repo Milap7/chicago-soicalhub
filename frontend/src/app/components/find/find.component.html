@@ -1,7 +1,17 @@
 <div>
     <br>
     <mat-card>
-  
+      <button style= "margin-bottom: 10px" mat-raised-button color="primary" routerLink="/homepage">
+        Home
+        &nbsp; &nbsp; &nbsp;
+        <mat-icon>home</mat-icon>
+      </button>
+      <button style = "margin-bottom:10px" mat-raised-button color="primary"  style = "float:right"  routerLink = "/homepage" >
+        Back
+        &nbsp; &nbsp; &nbsp; 
+        <mat-icon>keyboard_arrow_left</mat-icon>    
+      </button>
+      &nbsp; &nbsp;&nbsp;
       <mat-divider></mat-divider>
       <br>
       <form [formGroup]="createForm" class="create-form">
@@ -24,11 +34,22 @@
                   </mat-form-field>  
   
                   <br><br>
+
+                  <mat-form-field  class="field-full-width">
+                    <mat-label color=blue> Zipcode</mat-label>
+                    <input align="start" matInput  formControlName="zipcode" #zipcode>
+                    <mat-hint [ngStyle]="{color: hintColor}">Near me, ... </mat-hint>
+
+                  </mat-form-field>  
+  
+                  <br><br>
   
                 <mat-divider></mat-divider>
                   <br><br>
+
+               
   
-                <button type="submit" (click)="findPlaces(find.value,  where.value)"  mat-raised-button >
+                <button type="submit" (click)="findPlaces(find.value, where.value, zipcode.value)"  mat-raised-button >
                     Go
                     &nbsp; &nbsp; &nbsp; 
                     <mat-icon>search</mat-icon>      

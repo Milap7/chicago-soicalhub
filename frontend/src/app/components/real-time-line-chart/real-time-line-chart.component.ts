@@ -8,12 +8,13 @@ import * as d3Scale from 'd3-scale';
 import * as d3Shape from 'd3-shape';
 import * as d3Array from 'd3-array';
 import * as d3Axis from 'd3-axis';
+import * as d3Time from 'd3-time';
 import {ticks} from "d3-array";
 import {Station} from "../../station";
 import {MatCheckboxModule} from '@angular/material/checkbox';
 import { SMALog } from 'src/app/sma';
 
-
+var timer;
 @Component({
   selector: 'app-real-time-line-chart',
   templateUrl: './real-time-line-chart.component.html',
@@ -29,7 +30,7 @@ export class RealTimeLineChartComponent implements OnInit {
   hours_24 : StationLogElastic[] = [];
   log_1:StationLogElastic[] = [];
   hours_1:StationLogElastic[] = [];
-  private margin = {top: 0, right: 20, bottom: 30, left: 50};
+  private margin = {top: 20, right: 20, bottom: 30, left: 50};
   private width: number;
   private height: number;
   private x: any;
@@ -44,7 +45,7 @@ export class RealTimeLineChartComponent implements OnInit {
   sma_24:SMALog[] = [];
 
   constructor(private placesService: PlacesService, private router: Router, private http: HttpClient) {
-    this.width = 800 - this.margin.left - this.margin.right;
+    this.width = 600 - this.margin.left - this.margin.right;
     this.height = 350 - this.margin.top - this.margin.bottom;
    }
 
@@ -57,19 +58,26 @@ export class RealTimeLineChartComponent implements OnInit {
     });
   }
 
+  ngOnDestroy() {
+    console.log("Destroyed");
+    clearTimeout(timer);
+
+  }
+
   updateLogs() {
     this.fetchLogs();
     this.fetchLogs_1();
     this.fetchLogs_24();
     var _this = this;
-      setTimeout(function() {
+    timer = setTimeout(function() {
         _this.updateLogs()
       }, 126000);
   }
 
-  changeInterval(numHours) {
+  changeInterval_line(numHours) {
     console.log("Number of hours: " + numHours);
     this.numHours = numHours;
+    clearTimeout(timer);
     this.updateLogs();
     this.checked1 = false;
     this.checked24 = false;
@@ -98,6 +106,22 @@ export class RealTimeLineChartComponent implements OnInit {
       d3.select('g.rect.legend24').remove();
       d3.select('circle.dot24').remove();
     }
+  }
+  private granularity;
+  private setGranularity(){
+    if(this.numHours == 1){
+      this.granularity = d3Time.timeMinute.every(5)
+    }
+    else if(this.numHours == 24){
+      this.granularity = d3Time.timeHour.every(2)
+    }
+    else if(this.numHours == 168){
+      this.granularity = d3Time.timeHour.every(12)
+    }
+    else if(this.numHours == 672) {
+      this.granularity = d3Time.timeDay.every(2);
+    }
+
   }
 
   calculateAverage(hours:StationLogElastic[]) {
@@ -301,9 +325,9 @@ export class RealTimeLineChartComponent implements OnInit {
   }
 
   private initSvg() {
-    this.svg = d3.select('chartElm').select('svg').remove();
-    document.getElementById('chartElm').innerHTML='<svg width="1000" height="400"></svg>'
-    this.svg = d3.select('svg')
+    this.svg = d3.select('#chartElm_line').select('svg').remove();
+    document.getElementById('chartElm_line').innerHTML='<svg width="600" height="440" style = "margin-top:20px"></svg>'
+    this.svg = d3.select('#chartElm_line svg')
       .append('g')
       .attr('transform', 'translate(' + this.margin.left + ',' + this.margin.top + ')');
   }
@@ -316,24 +340,30 @@ export class RealTimeLineChartComponent implements OnInit {
   }
 
   private drawAxis() {
-
+    this.setGranularity();
     this.svg.append('g')
       .attr('class', 'axis axis--x')
       .attr('transform', 'translate(0,' + this.height + ')')
-      .call(d3Axis.axisBottom(this.x));
+      .call(d3Axis.axisBottom(this.x).ticks(this.granularity));
+
+      this.svg.append("text")             
+      .attr("transform",
+            "translate(" + (this.width/2) + " ," + 
+                           (this.height + this.margin.top + 65) + ")")
+      .style("text-anchor", "middle")
+      .text("Time Range");
 
 
     this.svg.append('g')
       .attr('class', 'axis axis--y')
       .call(d3Axis.axisLeft(this.y))
-
-      .append('text')
-      .attr('class', 'axis-title')
-      .attr('transform', 'rotate(-90)')
-      .attr('y', 6)
-      .attr('dy', '.71em')
-      .style('text-anchor', 'end')
-      .text('Price ($)')
+    this.svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - this.margin.left + 5)
+      .attr("x",0 - (this.height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Total Docks");  
 
   }
 
@@ -352,15 +382,51 @@ export class RealTimeLineChartComponent implements OnInit {
       .attr("stroke-linejoin", "round")
       .attr("stroke-linecap", "round")
 
-    this.svg.selectAll(".text")
-      .data(this.hours)
-      .enter()
-      .append("text")
-      .attr('class', 'text')
-      .attr("transform",
-        "translate(" + (this.width/2) + " ," +
-        (this.height + this.margin.top + 40) + ")")
-      .style("text-anchor", "middle")
-      .text("Time Range")
+    // this.svg.selectAll(".text")
+    //   .data(this.hours)
+    //   .enter()
+    //   .append("text")
+    //   .attr('class', 'text')
+    //   .attr("transform",
+    //     "translate(" + (this.width/2) + " ," +
+    //     (this.height + this.margin.top + 40) + ")")
+    //   .style("text-anchor", "middle")
+    //   .text("Time Range")
+
+    var legend = this.svg.append('g')
+      .attr("class", "legend")
+      .attr("x", 20)
+      .attr("y",3)
+      .attr("width", 18)
+      .attr("height",10)
+
+      legend.append("rect")
+      .attr("class", "legend1")
+      .attr("x", 220)
+      .attr("y", 350)
+      .attr("width", 18)
+      .attr("height", 10)
+      .style("fill", 'green')
+      .attr("font-size", "10px");
+
+    legend.append("text")
+      .attr("class", "legendTxt")
+      .style("font-size", "13px")
+      .attr("x", 240)
+      .attr("y", 350)
+      .attr("dy", "10px")
+      .style("text-anchor", "start")
+      .text("Available Docks")
+      .attr("font-size", "10px");
+
+    // legend.append("text")
+    //   .attr("class", "legendTxt")
+    //   .style("font-size", "13px")
+    //   .attr("x", 700)
+    //   .attr("y", 18)
+    //   .attr("dy", "10px")
+    //   .style("text-anchor", "start")
+    //   .text("Y-Axis: TotalDocks")
+    //   .attr("font-size", "10px");
   }
 }

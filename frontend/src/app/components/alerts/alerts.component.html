@@ -1,0 +1,71 @@
+<button mat-raised-button color="primary" style = "background-color: purple; margin-top: 20px; margin-left:20px" routerLink="/homepage">
+  Home
+  &nbsp; &nbsp; &nbsp; 
+  <mat-icon>home</mat-icon>    
+</button>
+<button mat-raised-button color="primary"  routerLink="/list_of_places" style = "float:right;background-color:purple; margin-top:20px; margin-right:20px">
+  Back
+  &nbsp; &nbsp; &nbsp; 
+  <mat-icon>keyboard_arrow_left</mat-icon>    
+</button>
+
+<table mat-table  id = "alerts_table" [dataSource] = "finalArray" *ngIf="count==places.length*3" style = "width:97%; margin-top:30px; margin-left:20px; margin-right:20px">
+  <ng-container matColumnDef="id" >
+    <th mat-header-cell *matHeaderCellDef style = "font-weight: bold; font-size: 15px">Station ID</th>
+    <td mat-cell *matCellDef="let element" [ngStyle] = "{'background-color' : element.color}"> {{element.id}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="stationName">
+    <th mat-header-cell  *matHeaderCellDef style = "font-weight: bold; font-size: 15px" >Station Name</th>
+    <td mat-cell *matCellDef="let element" [ngStyle] = "{'background-color' : element.color}"> {{element.stationname}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="availableBikes">
+    <th mat-header-cell  *matHeaderCellDef style = "font-weight: bold; font-size: 15px" >Available Bikes</th>
+    <td mat-cell *matCellDef="let element" [ngStyle] = "{'background-color' : element.color}"> {{element.availablebikes}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="availableDocks">
+    <th mat-header-cell  *matHeaderCellDef style = "font-weight: bold; font-size: 15px" >Available Docks</th>
+    <td mat-cell *matCellDef="let element" [ngStyle] = "{'background-color' : element.color}"> {{element.availabledocks}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="is_renting">
+    <th mat-header-cell  *matHeaderCellDef style = "font-weight: bold; font-size: 15px" >Is_Renting</th>
+    <td mat-cell *matCellDef="let element" [ngStyle] = "{'background-color' : element.color}"> {{element.is_renting}} </td>
+  </ng-container>
+
+  <!-- <ng-container matColumnDef="lastCommunicationTime">
+    <th mat-header-cell  *matHeaderCellDef style = "font-weight: bold; font-size: 15px" >lastCommTime </th>
+    <td mat-cell *matCellDef="let element" [ngStyle] = "{'background-color' : element.color}"> {{element.lastCommunicationTime}} </td>
+  </ng-container> -->
+
+  <!-- <ng-container matColumnDef="latitude">
+    <th mat-header-cell  *matHeaderCellDef style = "font-weight: bold; font-size: 15px" >latitude</th>
+    <td mat-cell *matCellDef="let element" [ngStyle] = "{'background-color' : element.color}"> {{element.latitude}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="longitude">
+    <th mat-header-cell  *matHeaderCellDef style = "font-weight: bold; font-size: 15px" >longitude</th>
+    <td mat-cell *matCellDef="let element" [ngStyle] = "{'background-color' : element.color}"> {{element.longitude}} </td>
+  </ng-container> -->
+
+    
+  <ng-container matColumnDef="totalDocks">
+    <th mat-header-cell  *matHeaderCellDef style = "font-weight: bold; font-size: 15px" >Total Docks</th>
+    <td mat-cell *matCellDef="let element" [ngStyle] = "{'background-color' : element.color}"> {{element.totaldocks}} </td>
+  </ng-container>
+
+  <ng-container matColumnDef="status">
+      <th mat-header-cell  *matHeaderCellDef style = "font-weight: bold; font-size: 15px">Status</th>
+      <td mat-cell *matCellDef="let element" [ngStyle] = "{'background-color' : element.color}"> {{element.status}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="lastCheck">
+        <th mat-header-cell  *matHeaderCellDef style = "font-weight: bold; font-size: 15px">Last Check</th>
+        <td mat-cell *matCellDef="let element" [ngStyle] = "{'background-color' : element.color}"> {{element.lastCommunicationTime}} </td>
+      </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="columsToDisplay"></tr>
+  <tr mat-row *matRowDef="let row; columns: columsToDisplay;"></tr>
+</table>

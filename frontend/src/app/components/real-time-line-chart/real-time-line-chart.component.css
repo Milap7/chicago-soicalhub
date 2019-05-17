@@ -1,0 +1,7 @@
+#chartElm_line {
+    flex: 1;
+    /* border: 0.25px solid black; */
+    box-shadow: 2px 2px grey;
+    background-color: rgb(240,240,240);
+    border-radius: 3px
+  }

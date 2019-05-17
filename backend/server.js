@@ -136,6 +136,7 @@ var stations_found = [];
 var place_selected;
 var stations_logs = [];
 var station_elastic_logs = [];
+var station_heatMap = [];
 
 
 
@@ -209,7 +210,7 @@ router.route('/places/find').post((req, res) => {
 
     find_places_task_completed = false;             
 
-    find_places_from_yelp(req.body.find, req.body.where).then(function (response) {
+    find_places_from_yelp(req.body.find, req.body.where, req.body.zipcode).then(function (response) {
         var hits = response;
         res.json(places_found);
         console.log("Places Found: " + places_found);
@@ -241,39 +242,49 @@ router.route('/stations/find').post((req, res) => {
 
     find_stations_from_divvy(query).then(function (response) {
         var hits = response;
-        res.json({'stations_found': 'Added successfully'});
+        // res.json({'stations_found': 'Added successfully'});
+        res.json(stations_found);
     });
+
+    // res.json(stations_found);
  
 
 });
 
 
-// router.route('/stations/findLog').post((req, res) => {
+router.route('/stations/findLog').post((req, res) => {
 
-//     var str = JSON.stringify(req.body, null, 4);
-
-
-//     const query = {
-//         // give the query a unique name
-//         name: 'fetch-divvy-logs',
-//         text: ' SELECT * FROM divvy_stations_logs WHERE timecreated >= NOW() - $1 * interval \'1 hour\' AND timecreated <= NOW() AND id = $2 ORDER BY timecreated ASC',
-//         values: [req.body.hours, req.body.stationID]
-//     }
-
-//     get_divvy_logs(query).then(function (response) {
-//         var hits = response;
-//         res.json(stations_logs);
-//     });
+    var str = JSON.stringify(req.body, null, 4);
 
 
-// });
+    const query = {
+        // give the query a unique name
+        name: 'fetch-divvy-logs',
+        text: ' SELECT * FROM divvy_stations_logs WHERE timecreated >= NOW() - $1 * interval \'1 hour\' AND timecreated <= NOW() AND id = $2 ORDER BY timecreated ASC',
+        values: [req.body.hours, req.body.stationID]
+    }
+
+    get_divvy_logs(query).then(function (response) {
+        var hits = response;
+        res.json(stations_logs);
+    });
+
+
+});
 
 //  Get Divvy logs from logstash-elasticsearch  
 router.route('/stations/findDivvyLog').post((req,res) => {
     var str = JSON.stringify(req.body, null, 4);
+    date = new Date();
+
+    timeInterval = req.body.hours;
+
+    console.log("time Interval from front end", timeInterval);
+
+    formatdate = moment(date.setHours(date.getHours() - timeInterval)).format('YYYY-MM-DD HH:mm:ss');
 
 
-    find_divvy_from_elastic(req.body.stationID, req.body.hours).then(function (response) {
+    find_divvy_from_elastic(req.body.stationID, formatdate, date).then(function (response) {
         var hits = response;
         res.json(station_elastic_logs);
         // console.log("Stations Found from elasticsearch: " + hits);
@@ -282,48 +293,45 @@ router.route('/stations/findDivvyLog').post((req,res) => {
 
 })
 
+router.route('/stations/findDivvyHeatMap').post((req,res) => {
+    var str = JSON.stringify(req.body, null, 4);
+    divvy_heatMap(req.body.hours).then(function (response) {
+        var hits = response;
+        res.json(station_heatMap);
+        // console.log("Stations Found from elasticsearch: " + hits);
+    });
+})
+
 
 //Async function for Divvy-Elastic
 
-async function find_divvy_from_elastic(stationID, hours) {
-
+async function divvy_heatMap(hours) {
     var timezoneoffset = new Date().getTimezoneOffset() / 60
     var hourinteval = parseInt(hours) + parseInt(timezoneoffset);
     console.log("Num of hours: " + hours);
     console.log("Hour Interval: " + hourinteval);
     let body = {
-        size: 5100,
+        size: 100000,
         from: 0,
-        // "mappings" : {
-        //     "properties" : {
-        //         "timeCreated" : {
-        //             "type" :    "text",
-        //             "fielddata" : true
-        //         }
-        //     }
-        // },
         "query": {
-          "bool" : {
-            "must" : {
-               "match" : { "id" : stationID } 
-            },
-            "filter":{ 
-			    "range" : 
-			      {
-                    "timeCreated" : {
-                        "gt" : "now-"+hourinteval+"h" 
+            "bool" : {
+              "filter":{ 
+                  "range" : 
+                    {
+                      "timeCreated" : {
+                          "gt" : "now-"+hourinteval+"h" 
+                      }
                     }
-                  }
-			  }
+                }
+            },
           },
-        },
 		"sort" : [
 			{"timeCreated" : { "order" : "asc" } }
 		]
     }
 
     results = await esClient.search({index: 'divvy_stations_logs', body: body});
-    station_elastic_logs = [];
+    station_heatMap = [];
     results.hits.hits.forEach((hit, index) => {
         plainTextDateTime =  moment(hit._source.lastcommunicationtime).format('YYYY-MM-DD, h:mm:ss a');
         logTime = moment(hit._source.timeCreated).format('YYYY-MM-DD, h:mm:ss a');
@@ -340,6 +348,57 @@ async function find_divvy_from_elastic(stationID, hours) {
             "totalDocks": hit._source.totalDocks,
             "timeCreated" : logTime
         };
+        station_heatMap.push(station);
+    });
+}
+
+async function find_divvy_from_elastic(stationID, hours) {
+
+    var timezoneoffset = new Date().getTimezoneOffset() / 60
+    var hourinteval = parseInt(hours) + parseInt(timezoneoffset);
+    console.log("Num of hours: " + hours);
+    console.log("Hour Interval: " + hourinteval);
+    let body = {
+        size: 100000,
+        from: 0,
+        "query": {
+          "bool" : {
+            "must" : {
+               "match" : { "id" : stationID } 
+            },
+            "filter":{ 
+			    "range" : 
+			      {
+                    "lastCommunicationTime.keyword" : {
+                        "gte" : formatdate, "lt" :date.keyword 
+                    }
+                  }
+			  }
+          },
+        },
+		"sort" : [
+			{"lastCommunicationTime.keyword" : { "order" : "asc" } }
+		]
+    }
+
+    results = await esClient.search({index: 'divvy_stations_logs', body: body});
+    station_elastic_logs = [];
+    results.hits.hits.forEach((hit, index) => {
+        // plainTextDateTime =  moment(hit._source.lastcommunicationtime).format('YYYY-MM-DD, h:mm:ss a');
+        logTime = moment(hit._source.timeCreated).format('YYYY-MM-DD, h:mm:ss a');
+        var station = {
+            "id": hit._source.id,
+            "stationName": hit._source.stationName,
+            "availableBikes": hit._source.availableBikes,
+            "availableDocks": hit._source.availableDocks,
+            "is_renting": hit._source.is_renting,
+            "lastCommunicationTime": hit._source.lastCommunicationTime,
+            "latitude": hit._source.latitude,
+            "longitude": hit._source.longitude,
+            "status": hit._source.status,
+            "totalDocks": hit._source.totalDocks,
+            "timeCreated" : hit._source.lastCommunicationTime //Change from logTime to lastCoummunicationTime
+        };
         station_elastic_logs.push(station);
     });
 
@@ -355,6 +414,7 @@ async function find_divvy_from_elastic(stationID, hours) {
 
 ////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
+
 
 
 async function find_stations_from_divvy(query) {
@@ -435,7 +495,7 @@ async function find_stations_from_divvy(query) {
 
 
 
-async function find_places_from_yelp(place, where) {
+async function find_places_from_yelp(place, where, zipcode) {
 
     places_found = [];
 
@@ -461,10 +521,119 @@ async function find_places_from_yelp(place, where) {
             "must" : {
                "term" : { "categories.alias" : place } 
             },
+            // "filter" : [
+            //     {"term" : {"location.address1" : where}},
+            //     {"term" : {"location.zip_code" : zipcode}}
+            // ],
+            // "filter": {
+            //     "term" : { "location.address1" : where  }
+                
+            // },
+            // "filter": {
+            //     "term" : { "location.zip_code" : zipcode  }
+            // },
+            // // "match" : {
+            // //     "location.address1" : where
+            // // },
+            // // "match" : {
+            // //     "location.zip_code" : zipcode
+            // // // },
+            //     "should" : [
+
+            //         {"filter": {
+            //              "term" : { "location.address1" : where  }
+                
+            //          } },
+
+            //          { "filter": {
+            //             "term" : { "location.zip_code" : zipcode  }
+            //          }},
+            //     ],
+            "filter" :
+             {
+                 "bool" : {
+                     "should" : [
+                        { "term" : {"location.address1" : where}},
+                        {"term" : {"location.zip_code" : zipcode}}
+                     ]
+                 }
+             },
+
+            "must_not" : {
+              "range" : {
+                "rating" : { "gte" : 4.0 }
+              }
+            },
+
+            "must_not" : {
+              "range" : {
+                "review_count" : { "lte" : 500 }
+              }
+            },
+
+            "should" : [
+              { "term" : { "is_closed" : "false" } }
+            ],
+          }
+        }
+    }
+
+
+    results = await esClient.search({index: 'chicago_yelp_reviews', body: body});
+
+    results.hits.hits.forEach((hit, index) => {
+        
+
+        var place = {
+                "name": hit._source.name,
+                "display_phone": hit._source.display_phone,
+                "address1": hit._source.location.address1,
+                "is_closed": hit._source.is_closed,
+                "rating": hit._source.rating,
+                "review_count": hit._source.review_count,
+                "latitude": hit._source.coordinates.latitude,    
+                "longitude": hit._source.coordinates.longitude
+        };
+
+        places_found.push(place);
+    });
+    console.log(places_found);
+
+    find_places_task_completed = true;             
+      
+}
+router.route('/places/findZipcode').post((req, res) => {
+
+    var str = JSON.stringify(req.body, null, 4);
+
+    find_places_task_completed = false;             
+
+    find_places_from_yelp_zipcode(req.body.find, req.body.zipcode).then(function (response) {
+        var hits = response;
+        res.json(places_found);
+        console.log("Places Found: " + places_found);
+    });
+
+});
+
+/// Search Elasticsearch for restarauts using zipcode //
+
+async function find_places_from_yelp_zipcode(place, zipcode) {
+
+    places_found = [];
+
+    let body = {
+        size: 1000,
+        from: 0,
+        "query": {
+          "bool" : {
+            "must" : {
+               "term" : { "categories.alias" : place } 
+            },
 
 
             "filter": {
-                "term" : { "location.address1" : where  }
+                "term" : { "location.postal_code" : zipcode  }
             },
 
 
@@ -511,8 +680,6 @@ async function find_places_from_yelp(place, where) {
     find_places_task_completed = true;             
       
 }
-
-
 
 app.use('/', router);
 

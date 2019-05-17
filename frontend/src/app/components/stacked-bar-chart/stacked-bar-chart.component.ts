@@ -18,7 +18,7 @@ export class StackedBarChartComponent implements OnInit {
   private chartContainer: ElementRef;
   
 
-  stations: Station[] = [];
+  stations= [];
   stackedChartData : stackedChartData[] = [];
   
   constructor(private placesService: PlacesService, private router: Router, private http: HttpClient) {
@@ -36,27 +36,32 @@ export class StackedBarChartComponent implements OnInit {
   fetchStations() {
     this.placesService
       .getStations()
-      .subscribe((data: Station[]) => {
+      .subscribe((data: []) => {
+        console.log(data);
         this.stations = data;
+        console.log("Stations: \n");
+        console.log(this.stations);
         this.drawChart();
       });
   }
 
   drawChart() {
     for(var i = 0; i<this.stations.length;i++) {
-      this.stackedChartData.push({"stationName" :this.stations[i].stationName,
-        "availableBikes" : this.stations[i].availableBikes, "availableDocks":this.stations[i].availableDocks,
-        "totalDocks":this.stations[i].totalDocks});
+      this.stackedChartData.push({"stationname" :this.stations[i].stationname,
+        "availablebikes" : this.stations[i].availablebikes, "availabledocks":this.stations[i].availabledocks,
+        "totaldocks":this.stations[i].totaldocks});
     }
-    console.log(this.stackedChartData);
+    // console.log(this.stackedChartData);
     this.createChart();
   }
   
   private createChart(): void {
       console.log("Chart")
+    console.log("Stations from create chart\n");
+    console.log(this.stations);
     
-    var svgWidth = 800, svgHeight = 300, barPadding = 0.1;
-    var margin = { top: 50, right: 30, bottom: 50, left: 30 };
+    var svgWidth = 550, svgHeight = 300, barPadding = 0.1;
+    var margin = { top: 50, right: 0, bottom: 60, left: 50 };
     var contentWidth = svgWidth - margin.left - margin.right;
     var contentHeight = svgHeight - margin.top - margin.bottom;
     
@@ -72,12 +77,12 @@ export class StackedBarChartComponent implements OnInit {
     .attr("height", svgHeight);
     
     var xScale = d3.scaleBand()
-    .domain(this.stackedChartData.map(d => d.stationName.toString()))
+    .domain(this.stackedChartData.map(d => d.stationname.toString()))
     .rangeRound([0, contentWidth])
     .padding(barPadding);
     
     var yScale = d3.scaleLinear()
-    .domain([0, d3.max(this.stackedChartData.map(d => +d.totalDocks))])
+    .domain([0, d3.max(this.stackedChartData.map(d => +d.totaldocks))])
     .rangeRound([contentHeight,0]);
     
     const g = svg.append('g')
@@ -97,6 +102,25 @@ export class StackedBarChartComponent implements OnInit {
     .attr('dy', '0.71em')
     .attr('text-anchor', 'end')
 
+    g.selectAll(".text")
+      .data(this.stackedChartData)
+      .enter()
+      .append("text")
+      .attr('class', 'text')
+      .attr("transform",
+        "translate(" + (contentWidth/2) + " ," +
+        (contentHeight + margin.top ) + ")")
+      .style("text-anchor", "middle")
+      .text("Addresses of Divvy Stations")
+
+      g.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left + 10)
+      .attr("x",0 - (contentHeight / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Max Total Docks");
+
     /*
     Create the bottom rectangle for available bikes
      */
@@ -105,10 +129,10 @@ export class StackedBarChartComponent implements OnInit {
     .enter()
     .append('rect')
     .attr('class', 'bar')
-    .attr('x', d => xScale(d.stationName.toString()))
-    .attr('y', d => yScale(+d.availableBikes ))
+    .attr('x', d => xScale(d.stationname.toString()))
+    .attr('y', d => yScale(+d.availablebikes ))
     .attr('width', xScale.bandwidth())
-    .attr('height', d => contentHeight - yScale(+d.availableBikes))
+    .attr('height', d => contentHeight - yScale(+d.availablebikes))
     .attr('fill', fill_bars[1])
     
     g.selectAll(".text")
@@ -116,9 +140,9 @@ export class StackedBarChartComponent implements OnInit {
     .enter()
     .append("text")
     .attr('class', 'text')
-    .text(d => +d.availableBikes)
-    .attr('x', d => xScale(d.stationName.toString()) + 5)
-    .attr('y', d => yScale(+d.availableBikes) + 17)
+    .text(d => +d.availablebikes)
+    .attr('x', d => xScale(d.stationname.toString()) + 5)
+    .attr('y', d => yScale(+d.availablebikes) + 17)
     .attr("fill", textColor)
     .attr("font-size", "10px");
 
@@ -130,10 +154,10 @@ export class StackedBarChartComponent implements OnInit {
     .enter()
     .append('rect')
     .attr('class', 'bar2')
-    .attr('x', d => xScale(d.stationName.toString()))
-    .attr('y', d => yScale(d.totalDocks))
+    .attr('x', d => xScale(d.stationname.toString()))
+    .attr('y', d => yScale(d.totaldocks))
     .attr('width', xScale.bandwidth())
-    .attr('height', d => contentHeight - yScale(d.availableDocks))
+    .attr('height', d => contentHeight - yScale(+d.availabledocks))
     .attr('fill', fill_bars[0]);
 
     g.selectAll(".text2")
@@ -141,11 +165,13 @@ export class StackedBarChartComponent implements OnInit {
     .enter()
     .append("text")
     .attr('class', 'text2')
-    .text(d => +d.availableDocks)
-    .attr('x', d => xScale(d.stationName.toString())+5)
-    .attr('y', d => yScale(d.totalDocks)+17)
+    .text(d => +d.availabledocks)
+    .attr('x', d => xScale(d.stationname.toString())+5)
+    .attr('y', d => yScale(d.totaldocks)+17)
     .attr("fill", textColor)
     .attr("font-size", "10px");
+
+    
 
     var legend = svg.append('g')
     .attr("class", "legend")
@@ -156,8 +182,8 @@ export class StackedBarChartComponent implements OnInit {
 
      legend.append("rect")
      .attr("class", "legend")
-     .attr("x", 20)
-     .attr("y", 5)
+     .attr("x", 440)
+     .attr("y", 17)
      .attr("width", 18)
      .attr("height", 10)
      .style("fill", fill_bars[1])
@@ -166,8 +192,8 @@ export class StackedBarChartComponent implements OnInit {
      legend.append("text")
      .attr("class", "legendTxt")
      .style("font-size", "13px")
-     .attr("x", 40)
-     .attr("y", 5)
+     .attr("x", 460)
+     .attr("y", 17)
      .attr("dy", "10px")
      .style("text-anchor", "start")
      .text("Available Bikes")
@@ -175,8 +201,8 @@ export class StackedBarChartComponent implements OnInit {
 
      legend.append("rect")
      .attr("class", "legend")
-     .attr("x", 20)
-     .attr("y", 20)
+     .attr("x", 440)
+     .attr("y", 0)
      .attr("width", 18)
      .attr("height", 10)
      .style("fill", fill_bars[0]);
@@ -184,12 +210,20 @@ export class StackedBarChartComponent implements OnInit {
      legend.append("text")
      .attr("class", "legendTxt")
      .style("font-size", "13px")
-     .attr("x", 40)
-     .attr("y", 20)
+     .attr("x", 460)
+     .attr("y", 0)
      .attr("dy", "10px")
      .style("text-anchor", "start")
      .text("Available Docks");
 
+    //  legend.append("text")
+    //  .attr("class", "legendTxt")
+    //  .style("font-size", "13px")
+    //  .attr("x", 35)
+    //  .attr("y", 37)
+    //  .attr("dy", "10px")
+    //  .style("text-anchor", "start")
+    //  .text("Y-Axis: Total Docks");
     
     
   }

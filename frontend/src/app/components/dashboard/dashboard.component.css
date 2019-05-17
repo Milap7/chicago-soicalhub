@@ -1,0 +1,44 @@
+#wrapper {
+    display: flex;
+  }
+  
+  #chartElm {
+    flex: 0 0 48%; /*Change to 48%*/
+    background-color: rgb(240,240,240);
+    box-shadow: 2px 2px grey;
+    border-radius: 3px;
+  } 
+  
+   #chartElm_1 {
+    flex: 1;
+    box-shadow: 2px 2px grey;
+    background-color: rgb(240,240,240);
+    border-radius: 3px;
+  }
+
+
+  #wrapper_1 {
+    display: flex;
+  }
+  
+  #linechart {
+    flex: 0 0 48%; /*Change to 48%*/
+    background-color: rgb(240,240,240);
+    box-shadow: 2px 2px grey;
+    border-radius: 3px;
+  } 
+  
+   #stacked {
+    flex: 1;
+    box-shadow: 2px 2px grey;
+    background-color: rgb(240,240,240);
+    border-radius: 3px;
+  }
+
+/* .line:hover {
+   
+}
+
+.line24:hover {
+
+} */

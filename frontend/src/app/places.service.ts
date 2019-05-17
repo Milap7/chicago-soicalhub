@@ -76,14 +76,24 @@ export class PlacesService {
 
 
 
-  findPlaces(find, where) {
+  findPlaces(find, where, zipcode) {
     const find_places_at = {
       find: find,
-      where: where
+      where: where,
+      zipcode : zipcode
     };
 
     return this.http.post(`${this.uri}/places/find`, find_places_at, httpOptions);
 
+  }
+
+  findPlaces_Zipcode(find, zipcode) {
+    const find_places_at = {
+      find: find,
+      zipcode: zipcode
+    };
+
+    return this.http.post(`${this.uri}/places/findZipcode`, find_places_at, httpOptions);
   }
 
  
@@ -121,6 +131,12 @@ export class PlacesService {
     return this.http.post(`${this.uri}/stations/findDivvyLog`, find_logs_at_elastic, httpOptions);
   }
 
+  find_divvyHeatMap(hours) {
+    const find_data_heat_map = {
+      hours : hours
+    };
+    return this.http.post(`${this.uri}/stations/findDivvyHeatMap`,find_data_heat_map, httpOptions)
+  }
 
  
 

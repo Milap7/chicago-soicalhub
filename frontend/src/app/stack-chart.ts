@@ -1,6 +1,6 @@
 export interface stackedChartData {
-    stationName: String;
-    availableBikes: Number;
-    availableDocks: Number;
-    totalDocks: Number;
+    stationname: String;
+    availablebikes: Number;
+    availabledocks: Number;
+    totaldocks: Number;
 }

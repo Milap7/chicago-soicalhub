@@ -26,6 +26,7 @@ import { Input, ViewChild, NgZone} from '@angular/core';
 import { MapsAPILoader, AgmMap } from '@agm/core';
 import { GoogleMapsAPIWrapper } from '@agm/core/services';
 import { Place } from 'src/app/place';
+import { PushNotificationsService } from 'src/app/push.notification.service';
 
 
 
@@ -52,12 +53,15 @@ interface Location {
 })
 export class ListOfStationsComponent implements OnInit {
 
+
   stations: Station[];
   markers: Station[];
   placeSelected: Place;
+  example: Number
 
 
-  displayedColumns = ['id', 'stationName', 'availableBikes', 'availableDocks', 'is_renting', 'lastCommunicationTime', 'latitude',  'longitude', 'status', 'totalDocks', 'realTimeChart'];
+
+  displayedColumns = ['id', 'stationName', 'availableBikes', 'availableDocks', 'is_renting', 'lastCommunicationTime', 'latitude',  'longitude', 'status', 'totalDocks', 'dashboard'];
 
 
   icon = {
@@ -70,12 +74,14 @@ export class ListOfStationsComponent implements OnInit {
 
 
 
-  constructor(private placesService: PlacesService, private router: Router) { }
+  constructor(private placesService: PlacesService, private router: Router, private _notificationService: PushNotificationsService) {
+    this._notificationService.requestPermission();
+   }
 
   ngOnInit() {
     this.fetchStations();
     this.getPlaceSelected();
-
+    
 
   }
 
@@ -86,15 +92,24 @@ export class ListOfStationsComponent implements OnInit {
         this.stations = data;
         this.markers = data;
         console.log(this.stations);
+        console.log(data)
+        data.map(d => {
+          if(d.availabledocks >= 0.9*+d.totaldocks) {
+            this.notify(d.id, d.totaldocks);
+          }
+          
+        })
 
       });
+      
   }
-
+  placeSelectedData = 0;
   getPlaceSelected() {
     this.placesService
       .getPlaceSelected()
       .subscribe((data: Place) => {
         this.placeSelected = data;
+        this.placeSelectedData = 1;
 
       });
   }
@@ -109,8 +124,8 @@ export class ListOfStationsComponent implements OnInit {
 
   sendIDSMA(stationID) {
 
-    this.placesService.findLogs(stationID,1).subscribe(() => {
-      this.router.navigate(['list_of_stations/sma-chart']);
+    this.placesService.find_divvyLogs(stationID,1).subscribe(() => {
+      this.router.navigate(['list_of_stations/dashboard']);
     });
   }
 
@@ -130,11 +145,14 @@ public location:Location = {
   zoom: 13
 };
 
-
-
-
-
-
+notify(id, totalDocks) {
+        let data: Array < any >= [];
+        data.push({
+            'title': 'Divvy Station ' + id + ' ALERT',
+            'alertContent': 'Divvy Station ' + id + " is 90% full"
+        });
+        this._notificationService.generateNotification(data);
+    }
 }
 
 

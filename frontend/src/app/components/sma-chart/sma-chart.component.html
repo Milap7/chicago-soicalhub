@@ -1,8 +1,22 @@
-<button mat-raised-button color="primary"  style = "margin:40px 20px 20px 20px"  routerLink = "/list_of_stations" >
+<button mat-raised-button color="primary"  style = "margin-left:20px"  routerLink = "/homepage" >
+  Home
+  &nbsp; &nbsp; &nbsp;
+  <mat-icon>home</mat-icon>
+</button>
+
+<button mat-raised-button color="primary"  style = "float:right; margin-right:20px; margin-top:65px"  routerLink = "/list_of_stations" >
   Back
   &nbsp; &nbsp; &nbsp;
-  <mat-icon>search</mat-icon>
+  <mat-icon>keyboard_arrow_left</mat-icon>
 </button>
-<div id="chartElm_1">
+<mat-form-field style = "margin-top:50px; margin-left:30px">
+  <mat-label>Time Range</mat-label>
+  <mat-select [(value)]="numHours" (selectionChange)="changeInterval(numHours)">
+    <mat-option value="1">1 Hour</mat-option>
+    <mat-option value="24">24 Hours</mat-option>
+    <mat-option value="168">7 Days</mat-option>
+  </mat-select>
+</mat-form-field>
+<div id="chartElm">
 
 </div>
