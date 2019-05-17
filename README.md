@@ -1,2 +1,2 @@
 # chicago-soicalhub
-![](chicago_social_final.gif)
+![](chicago-social_final.gif)
